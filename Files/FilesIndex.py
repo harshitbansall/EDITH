@@ -19,7 +19,9 @@ def newAccessToken(clientID,clientSecret,refreshToken):
         except:
             import webbrowser
             print("Requirement Of New Access Token for '{}'. Kindly Paste the Redirected Link Below.".format(mainAddress)),webbrowser.open('''https://accounts.google.com/o/oauth2/v2/auth?scope=https://www.googleapis.com/auth/youtube%20https://www.googleapis.com/auth/drive&prompt=consent&access_type=offline&include_granted_scopes=true&response_type=code&state=state_parameter_passthrough_value&redirect_uri=http://localhost&client_id={}'''.format(clientID))
-            response = eval(requests.post('https://accounts.google.com/o/oauth2/token', data={'code': re.split('[=&]',input("Redirected Link: "))[3].replace("%2F","/"),'client_id': clientID,'client_secret': clientSecret,'redirect_uri': 'http://localhost','grant_type': 'authorization_code'}).text)
+            response = eval(
+                requests.post('https://accounts.google.com/o/oauth2/token',
+                              data={'code': re.split('[=&]',input("Redirected Link: "))[3].replace("%2F","/"),'client_id': clientID,'client_secret': clientSecret,'redirect_uri': 'http://localhost','grant_type': 'authorization_code'}).text)
             mainDB.execute("update GoogleAPI set refreshToken = '{}' where address = '{}'".format(response['refresh_token'],mainAddress))
             mainDB.execute("update GoogleAPI set currentAccessToken = '{}', tokenExpiry = '{}' where address = '{}'".format(response['access_token'],(datetime.datetime.now()+datetime.timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S'),mainAddress)),mainDB.commit()
             return(response['access_token'])
@@ -61,7 +63,9 @@ def getRootID():
         else:
             rootIdData = mainDB.execute("select rootID from driveAccounts where status = 'In Use'").fetchone()[0]
             if rootIdData is None or rootIdData == "":
-                rootID = eval(requests.get('https://www.googleapis.com/drive/v2/about',headers = {"Authorization": "Bearer " + accessToken}).text.replace("true","True").replace("false","False"))['rootFolderId']
+                rootID = eval(
+                    requests.get('https://www.googleapis.com/drive/v2/about',
+                                 headers = {"Authorization": "Bearer " + accessToken}).text.replace("true","True").replace("false","False"))['rootFolderId']
                 mainDB.execute("update driveAccounts set rootID = '{}' where status = 'In Use'".format(rootID)),mainDB.commit()
                 return rootID
             else:

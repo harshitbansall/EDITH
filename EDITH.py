@@ -1,5 +1,14 @@
-import datetime,time,difflib,random,os,sqlite3,re,zlib
+import datetime,time,difflib,random,os,sqlite3,re
 from threading import Thread
+try:
+    import zlib
+except:
+    pathList = str(sys.executable).split("\\")
+    pathList.remove("pythonw.exe"),pathList.append("Scripts")
+    os.system("/".join(pathList)+"/pip.exe install zlib")
+##    os.system("/".join(pathList)+"/pip.exe install prettytable")
+    time.sleep(2)
+    import zlib
 startupPath, prevOutput, prevsNum = os.getcwd(), "", ""
 mainDB = sqlite3.connect(startupPath+"/Data/mainDB.db",check_same_thread=False)
 logDB = sqlite3.connect(startupPath+"/Data/_log_.db",check_same_thread=False)
@@ -28,7 +37,8 @@ def speak(query, show = True, end = "\n", wait = 0):
     prevOutput = query
 ######################################################################################################################################
 def wikipediaSearch(query):
-    query,mainMemory=" ".join([x for x in query.split() if x not in ['what','is','a','who','search','the']]).title(),open("C:/Users/Tania/Desktop/Harshit/EDITH/Data/_mainMemory_.txt").readlines()
+    query = " ".join([x for x in query.split() if x not in ['what','is','a','who','search','the']]).title()
+    mainMemory = open("Data/_mainMemory_.txt").readlines()
     for q in mainMemory:
         if q=="!{}!:\n".format(query.replace(' ','').lower()):speak(mainMemory[mainMemory.index(q)+1].replace("\n","")),main()
     from wikipedia import summary
